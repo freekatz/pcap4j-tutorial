@@ -1,7 +1,9 @@
 pcap4j-tutorial
 ======
 
-<img alt="Pcap4J" title="Pcap4J" src="./res/pcap4j-logo-color.png" width="70%" style="margin: 0px auto; display: block;" />
+<a href="https://github.com/kaitoy/pcap4j"><img alt="Pcap4J" title="Pcap4J" src="./res/pcap4j-logo-color.png" width="70%" style="margin: 0px auto; display: block;" />
+
+</a>
 
 结合日常使用为 Pcap4j 库编写的中文文档，包括教程、源码注释等
 
