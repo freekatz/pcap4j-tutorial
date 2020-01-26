@@ -1,3 +1,10 @@
+# Intellij IDEA project
+.idea/
+out/production/
+
+# 
+wheel/
+
 # Compiled class file
 *.class
 
