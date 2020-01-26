@@ -24,7 +24,7 @@
   * [配置库依赖](#配置库依赖)
   * [配置项目结构](#配置项目结构)
   * [测试](#测试)
-* [开始（实现 ARP 欺骗）](#开始（实现 ARP 欺骗）)
+* [开始（实现 ARP 欺骗）](#开始（实现ARP欺骗）)
   * (暂无)
 
 ****
@@ -158,7 +158,7 @@ git clone https://github.com/zjh567/pcap4j-tutorial
 
 ![proj-test](1-begin.assets/proj-test.png)
 
-开始（实现 ARP 欺骗）
+开始（实现ARP欺骗）
 ----------
 
 (暂无)
