@@ -1,7 +1,7 @@
 pcap4j-tutorial
 ======
 
-<a href="https://github.com/kaitoy/pcap4j"><img alt="Pcap4J" title="Pcap4J" src="./res/pcap4j-logo-color.png" width="70%" style="margin: 0px auto; display: block;" />
+<a href="https://github.com/kaitoy/pcap4j" target="_blank"><img alt="Pcap4J" title="Pcap4J" src="./res/pcap4j-logo-color.png" width="70%" style="margin: 0px auto; display: block;" />
 
 </a>
 
