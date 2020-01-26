@@ -13,14 +13,14 @@
   * [Why](#Why)
   * [How](#How)
 
-* [安装及配置 Pcap](#安装及配置 Pcap)
+* [安装及配置 Pcap](#安装及配置Pcap)
   * [下载](#下载)
   * [安装](#安装)
-  * [配置 NPcap 环境变量](#配置 NPcap 环境变量)
+  * [配置 NPcap 环境变量](#配置NPcap环境变量)
 * [初始化项目](#初始化项目)
   * [克隆](#克隆)
   * [打开项目](#打开项目)
-  * [配置 out 路径](#配置 out 路径)
+  * [配置 out 路径](#配置out路径)
   * [配置库依赖](#配置库依赖)
   * [配置项目结构](#配置项目结构)
   * [测试](#测试)
@@ -76,7 +76,7 @@
 
 关于如何使用见下文。
 
-安装及配置 Pcap
+安装及配置Pcap
 ----------
 
 **本文只介绍 Windows + NPcap**，其余的情况比较简单
@@ -93,7 +93,7 @@ https://nmap.org/npcap/dist/npcap-0.9986.exe
 
 下载完成，点击安装即可
 
-#### 配置 NPcap 环境变量 ####
+#### 配置NPcap环境变量 ####
 
 由于 **p4** 默认的扫描目录是
 
@@ -126,7 +126,7 @@ git clone https://github.com/zjh567/pcap4j-tutorial
 
 使用 **IntelliJ IDEA** 打开 **pcap4j-sample** 文件夹
 
-#### 配置 out 路径 ####
+#### 配置out路径 ####
 
 - File -> Project Structure -> Project -> Project compiler output 选择如图路径 -> ok
 
