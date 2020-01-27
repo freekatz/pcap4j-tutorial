@@ -110,14 +110,10 @@ package org.pcap4j.sample;
 
 import com.sun.jna.Platform;
 import java.io.IOException;
+
+import org.pcap4j.core.*;
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PacketListener;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
-import org.pcap4j.core.PcapStat;
 import org.pcap4j.util.NifSelector;
 
 @SuppressWarnings("javadoc")
@@ -167,7 +163,7 @@ public class Loop {
         }
 
         if (allDevs != null && !allDevs.isEmpty()) {
-            // do something
+            // do something here
             int deviceNum = 0;
             PcapNetworkInterface nif = Pcaps.getDevByName(alldev.get(deviceNum).getName());
         } else {
@@ -197,22 +193,25 @@ public class Loop {
       handle.setFilter(filter, BpfCompileMode.OPTIMIZE);
     }
 
-    // 开始侦听，其中 PacketListener 实现了一个接口，本代码直接输出了 PcapPacket 对象
+    // 开始侦听，其中 PacketListener 实现了一个接口
+    // 其中的 -> 代表的是 Java 的 Lambda 表达式, 解释如下:
+    /*
+      listener 会将侦听得到的 packet 作为回调参数 var1 传入 PacketListener 回调函数 void gotPacket(PcapPacket var1); 中
+      所以 packet -> System.out.println(packet); 相当于实现了 PacketListener 接口, 其中实现的回调函数为将传入的 packet 直接输出
+     */
     PacketListener listener = packet -> System.out.println(packet);
-    // 我们在自己的程序中可以实现这个接口的回调函数：void gotPacket(PcapPacket var1);
+    // 进一步的说, 以上代码就相当于下面的代码
     /*
     抓到报文回调gotPacket方法处理报文内容
     PacketListener listener =
-        new PacketListener() {
-          @Override
-          public void gotPacket(Packet packet) {
-            // 抓到报文走这里...
-            System.out.println(handle.getTimestamp());
-            System.out.println(packet);
-          }
-        };
-     */
-
+            new PacketListener() {
+              @Override
+              public void gotPacket(PcapPacket packet) {
+                // 抓到报文走这里...
+                System.out.println(packet);
+              }
+            };
+    */
 
     // 调用 loop 函数（还有许多其他捕获数据包的方法，日后再说）进行抓包，其中抓到的包则回调 listener 指向的回调函数
     try {

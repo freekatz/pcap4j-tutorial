@@ -1,3 +1,6 @@
+# template md file
+template*.md
+
 # Intellij IDEA project
 .idea/
 out/production/
