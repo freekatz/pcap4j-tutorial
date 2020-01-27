@@ -87,7 +87,7 @@ public class HeavyLoop {
     // 下面的代码是这次的重点
     /*
     1. Executor, ExecutorService, Executors 同属于 Executor 框架, 提供了启动, 管理和调度线程/线程池的接口和操作
-    2. 其中 ExecutorService 接口继承自 Executor 接口，它提供了更丰富的实现多线程的方法, 比如其中包括了使用 shutdown 方法来平滑地广播线程池
+    2. 其中 ExecutorService 接口继承自 Executor 接口，它提供了更丰富的实现多线程的方法, 比如其中包括了使用 shutdown 方法来平滑地关闭线程池
     3. Executors 类提供了一系列工厂方法用于创建线程池, 如:
     public static ExecutorService newFixedThreadPool(int nThreads) // 创建固定数目线程的线程池。
     public static ExecutorService newCachedThreadPool() //创建一个可缓存的线程池
