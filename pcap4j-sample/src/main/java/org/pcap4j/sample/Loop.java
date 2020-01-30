@@ -15,9 +15,9 @@ public class Loop {
   private static final String COUNT_KEY = Loop.class.getName() + ".count";
   private static final int COUNT = Integer.getInteger(COUNT_KEY, 1);
 
-  // 等待读取数据包的时间（以毫秒为单位），其中 -1 代表一直等待
+  // 等待读取数据包的时间（以毫秒为单位）, 必须非负 ,其中 0 代表一直等待直到抓到包为止
   private static final String READ_TIMEOUT_KEY = Loop.class.getName() + ".readTimeout";
-  private static final int READ_TIMEOUT = Integer.getInteger(READ_TIMEOUT_KEY, 10); // [ms]
+  private static final int READ_TIMEOUT = Integer.getInteger(READ_TIMEOUT_KEY, 0); // [ms]
 
   // 要捕获的最大数据包大小（以字节为单位）
   private static final String SNAPLEN_KEY = Loop.class.getName() + ".snaplen";
@@ -79,7 +79,6 @@ public class Loop {
     // 其中 PcapHandle 对象指的是对网卡的一系列操作，且 一个 PcapHandle 对象对应抓一个网卡的报文
     // 所以要捕获多网卡就要设置多个 PcapHandle，这就为同时进行多个抓包提供了可能
     final PcapHandle handle = nif.openLive(SNAPLEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
-
     // 设置网卡过滤器
     if (filter.length() != 0) {
       handle.setFilter(filter, BpfCompileMode.OPTIMIZE);

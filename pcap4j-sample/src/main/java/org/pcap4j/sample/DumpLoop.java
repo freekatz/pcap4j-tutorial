@@ -55,6 +55,11 @@ public class DumpLoop {
 
     PcapDumper dumper = handle.dumpOpen(PCAP_FILE);
     try {
+      /*
+      此代码只需注意这里，这里的 loop() 是重载函数，它封装了 jna 中 pcap_loop 的重载
+      到目前为止，loop 函数的两种实现我们全认识了
+      在这里，loop 函数直接将捕获的数据包 dump
+       */
       handle.loop(COUNT, dumper);
     } catch (InterruptedException e) {
       e.printStackTrace();
