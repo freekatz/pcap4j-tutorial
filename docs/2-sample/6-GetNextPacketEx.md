@@ -131,4 +131,4 @@ public class GetNextPacketEx {
 
 #### 总结 #####
 
-自此，我们以及认识了所有捕获数据包的方法，其中最优的是 **GetNextPacketEx**
+自此，我们已经认识了所有捕获数据包的方法，其中最优的是 **GetNextPacketEx**
