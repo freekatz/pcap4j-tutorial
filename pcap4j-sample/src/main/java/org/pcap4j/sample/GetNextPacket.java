@@ -27,6 +27,7 @@ public class GetNextPacket {
   private static final String SNAPLEN_KEY = GetNextPacket.class.getName() + ".snaplen";
   private static final int SNAPLEN = Integer.getInteger(SNAPLEN_KEY, 65536); // [bytes]
 
+  // 设置缓冲区大小, 单位为 字节, 在 Dump 的文章中已经提到, 使用 GetNextPacket 捕获数据包最好先设置缓冲区以防丢包
   private static final String BUFFER_SIZE_KEY = GetNextPacket.class.getName() + ".bufferSize";
   private static final int BUFFER_SIZE =
       Integer.getInteger(BUFFER_SIZE_KEY, 1 * 1024 * 1024); // [bytes]
@@ -36,6 +37,7 @@ public class GetNextPacket {
   private static final boolean TIMESTAMP_PRECISION_NANO =
       Boolean.getBoolean(TIMESTAMP_PRECISION_NANO_KEY);
 
+  // 初始化网卡名字, 即网卡标识, 为 null
   private static final String NIF_NAME_KEY = GetNextPacket.class.getName() + ".nifName";
   private static final String NIF_NAME = System.getProperty(NIF_NAME_KEY);
 
@@ -69,6 +71,7 @@ public class GetNextPacket {
     }
 
     System.out.println(nif.getName() + " (" + nif.getDescription() + ")");
+    // 以下代码为输出网卡的 IP, 包括 IPv4 以及 IPv6
     for (PcapAddress addr : nif.getAddresses()) {
       if (addr.getAddress() != null) {
         System.out.println("IP address: " + addr.getAddress());
@@ -103,6 +106,9 @@ public class GetNextPacket {
         }
       }
 
+      // 以上代码之前都已经说过, 不再重复
+      // 关于 PcapStat 类也没什么好说的, 它只统计了下面输出的这四个数值, 样例代码全写出来了,期待作者增加更多的统计属性
+      // 其实我挺想贡献一下的, 在这里立下个 Flag 了
       PcapStat ps = handle.getStats();
       System.out.println("ps_recv: " + ps.getNumPacketsReceived());
       System.out.println("ps_drop: " + ps.getNumPacketsDropped());

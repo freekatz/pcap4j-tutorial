@@ -54,6 +54,14 @@ public class GetNextPacketEx {
       int num = 0;
       while (true) {
         try {
+          // 此代码的重点在这里:
+          /*
+          Ex 顾名思义, 即扩展版, 扩展在哪里呢?
+          1. Ex 版本可以捕获更多的异常, 而且这些异常是经常出现的, 比如: 超时, 出错, EOF, 在不同情况下，Ex 版本会返回不同的值, 当然这些我们不必担心
+             而非 Ex 版本只可以捕获网卡打开失败的异常, 这在应用场景下是不可靠的
+          2. 非 Ex 版本的效率低下，尽管它也隐藏了回调的方式，但依然依赖于函数 dispatch (参数 packetCount 为 1)
+          3. 非 Ex 版本不能检测到文件末尾这个状态(EOF)，因此，如果数据包是从文件读取来的，必须使用 Ex 版本 (见 ReadPacket 样例)。
+           */
           Packet packet = handle.getNextPacketEx();
           System.out.println(packet);
           num++;
