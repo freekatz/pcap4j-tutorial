@@ -69,9 +69,9 @@ public class DefragmentEcho {
     // 此代码为离线模式, 因此无需绑定网卡, 直接定义了一个用于处理离线 pcap 文件的 handle
     PcapHandle handle = Pcaps.openOffline(PCAP_FILE);
 
-    // 定义了一个 Hash 映射, 键为短整型, 作为数据包的 ID, 值为 IPv4 数据包列表 (列表那肯定是可以迭代的了)
+    // 定义了一个 Hash 映射, 键为短整型, 作为数据包的 ID, 值为 IPv4 分片数据包列表 (列表那肯定是可以迭代的了)
     Map<Short, List<IpV4Packet>> ipV4Packets = new HashMap<Short, List<IpV4Packet>>();
-    // 定义了一个映射, 键为短整型, 作为数据包的 ID, 值为 Packet
+    // 定义了一个映射, 键为短整型, 作为数据包的 ID, 值为 Packet, 用于存放 IP 分片组装完成的原始数据包
     Map<Short, Packet> originalPackets = new HashMap<Short, Packet>();
 
     while (true) {
@@ -94,6 +94,7 @@ public class DefragmentEcho {
           list.add(packet.get(IpV4Packet.class));
           ipV4Packets.put(id, list); // IPv4 数据包
           originalPackets.put(id, packet); // 原始数据包, id 与 IPv4 的 id 一样
+          // 特别注意: 此时 originalPackets 中的数据包并不是真正的原始数据包, 而是 IP 分片的<b>第一个<b/>
         }
       } catch (TimeoutException e) {
         continue;
@@ -101,7 +102,6 @@ public class DefragmentEcho {
         break;
       }
     }
-
     for (Short id : ipV4Packets.keySet()) {
       List<IpV4Packet> list = ipV4Packets.get(id);
       // 由于同一个列表的数据包属于同一个 IP 分片, 故下面的代码则是将这些分配整理到一起
@@ -114,9 +114,10 @@ public class DefragmentEcho {
       如 originalPackets.get(id).getBuilder() 就是从原始数据包映射中得到一个数据包, 并使用 .getBuilder() 方法得到此数据包的构建器
       2. builder 对象可使用各种方法操纵数据包, 如 Packet (链路层) 的 builder 可操纵整个 Packet 上层 (即链路层及链路层之上)的数据包, 而
       IpPacket (网络层) 的 builder 可操纵整个 IpPacket 上层 (即网络层及网络层之上)的数据包
-      3. .getLowerLayerOf 方法即得到下层的具体协议的数据包, .payloadBuilder 方法则将上面组装的 IPv4 数据包设置到 builder
+      3. .getLowerLayerOf 方法即得到下层的具体协议的构建器, 再使用 .payloadBuilder 方法将传入的 builder 上传或是设置到 builder 中
       如果不设置则 builder 只会构建到网络层, 设置之后才可以构建到最上层 (此代码为 IcmpV4)
       4. .build 方法则是构建数据包, 返回 PcapPacket 对象
+      5. 编写程序时一定要注意 payload 和 builder 类型的一致性, 试想一下, 给一个 IpV4 构建器 payload 一个 Icmp 的构建器肯定是不行的
        */
       Packet.Builder builder = originalPackets.get(id).getBuilder();
       builder
@@ -125,7 +126,6 @@ public class DefragmentEcho {
 
       System.out.println(builder.build());
     }
-
     handle.close();
   }
 }

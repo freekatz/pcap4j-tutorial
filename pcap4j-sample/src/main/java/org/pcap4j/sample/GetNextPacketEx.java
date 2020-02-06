@@ -10,6 +10,8 @@ import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.TcpPacket;
+import org.pcap4j.packet.namednumber.HttpStatusCode;
 import org.pcap4j.util.NifSelector;
 
 @SuppressWarnings("javadoc")

@@ -13,7 +13,7 @@ public class Loop {
 
   // 设置 COUNT 常量，代表本次捕获数据包的数目，其中 -1 代表一直捕获
   private static final String COUNT_KEY = Loop.class.getName() + ".count";
-  private static final int COUNT = Integer.getInteger(COUNT_KEY, 1);
+  private static final int COUNT = Integer.getInteger(COUNT_KEY, -1);
 
   // 等待读取数据包的时间（以毫秒为单位）, 必须非负 ,其中 0 代表一直等待直到抓到包为止
   private static final String READ_TIMEOUT_KEY = Loop.class.getName() + ".readTimeout";

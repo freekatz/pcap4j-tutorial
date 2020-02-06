@@ -8,14 +8,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.pcap4j.core.*;
 import org.pcap4j.core.BpfProgram.BpfCompileMode;
-import org.pcap4j.core.NotOpenException;
-import org.pcap4j.core.PacketListener;
-import org.pcap4j.core.PcapHandle;
-import org.pcap4j.core.PcapNativeException;
-import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
-import org.pcap4j.core.Pcaps;
 import org.pcap4j.packet.ArpPacket;
 import org.pcap4j.packet.EthernetPacket;
 import org.pcap4j.packet.IcmpV4CommonPacket;
@@ -39,7 +35,7 @@ import org.pcap4j.util.NifSelector;
 @SuppressWarnings("javadoc")
 public class IcmpV4ErrReplyer {
 
-  private static MacAddress MAC_ADDR = MacAddress.getByName("fe:00:00:00:00:01");
+  private static MacAddress MAC_ADDR = MacAddress.getByName("D0:C6:37:3E:7A:FB");
 
   private IcmpV4ErrReplyer() {}
 
