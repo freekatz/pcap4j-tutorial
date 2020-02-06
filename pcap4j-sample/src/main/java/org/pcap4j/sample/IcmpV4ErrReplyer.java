@@ -35,7 +35,7 @@ import org.pcap4j.util.NifSelector;
 @SuppressWarnings("javadoc")
 public class IcmpV4ErrReplyer {
 
-  private static MacAddress MAC_ADDR = MacAddress.getByName("D0:C6:37:3E:7A:FB");
+  private static MacAddress MAC_ADDR = MacAddress.getByName("ec:26:ca:7e:d8:aa");
 
   private IcmpV4ErrReplyer() {}
 
@@ -91,10 +91,10 @@ public class IcmpV4ErrReplyer {
 
     handle4capture.setFilter(
         "(ether dst "
-            + MAC_ADDR
-            + ") or (arp and ether dst "
-            + Pcaps.toBpfString(MacAddress.ETHER_BROADCAST_ADDRESS)
-            + ")",
+            + MAC_ADDR + ")",
+//            + ") or (arp and ether dst "
+//            + Pcaps.toBpfString(MacAddress.ETHER_BROADCAST_ADDRESS)
+//            + ")",
         BpfCompileMode.OPTIMIZE);
 
     Packet.Builder tmp;
