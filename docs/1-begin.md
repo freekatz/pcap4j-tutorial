@@ -1,7 +1,7 @@
 介绍（Introduction）
 ======
 
-本文介绍了 Windows 下 Pcap4j 开发环境的配置，并实现了一个简单的 ARP 欺骗示例： [Code]()
+本文介绍了 Windows 下 Pcap4j 开发环境的配置
 
 ****
 
@@ -24,8 +24,6 @@
   * [配置库依赖](#配置库依赖)
   * [配置项目结构](#配置项目结构)
   * [测试](#测试)
-* [开始-实现 ARP 欺骗](#开始-实现ARP欺骗)
-  * (暂无)
 
 ****
 
@@ -154,11 +152,8 @@ git clone https://github.com/zjh567/pcap4j-tutorial
 
 #### 测试 ####
 
-运行 Loop，如正常运行则配置完成，如遇问题，请提 issue
+运行 Loop，如正常运行则配置完成
 
 ![proj-test](1-begin.assets/proj-test.png)
 
-开始-实现ARP欺骗
 ----------
-
-(暂无)
