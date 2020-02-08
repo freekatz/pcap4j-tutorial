@@ -14,14 +14,8 @@ import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.core.PcapNetworkInterface;
 import org.pcap4j.core.PcapNetworkInterface.PromiscuousMode;
 import org.pcap4j.core.Pcaps;
+import org.pcap4j.packet.*;
 import org.pcap4j.packet.AbstractPacket.AbstractBuilder;
-import org.pcap4j.packet.EthernetPacket;
-import org.pcap4j.packet.IcmpV4CommonPacket;
-import org.pcap4j.packet.IcmpV4EchoPacket;
-import org.pcap4j.packet.IpV4Packet;
-import org.pcap4j.packet.IpV4Rfc791Tos;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.UnknownPacket;
 import org.pcap4j.packet.namednumber.EtherType;
 import org.pcap4j.packet.namednumber.IcmpV4Code;
 import org.pcap4j.packet.namednumber.IcmpV4Type;
@@ -44,9 +38,11 @@ public class SendFragmentedEcho {
   private static final String SNAPLEN_KEY = SendFragmentedEcho.class.getName() + ".snaplen";
   private static final int SNAPLEN = Integer.getInteger(SNAPLEN_KEY, 65536); // [bytes]
 
+  // 发送 IP 数据包的大小, 也就是帧的传输单元大小
   private static final String TU_KEY = SendFragmentedEcho.class.getName() + ".tu";
   private static final int TU = Integer.getInteger(TU_KEY, 4000); // [bytes]
 
+  // 最大传输单元, 也就是 IP 分片的最大大小
   private static final String MTU_KEY = SendFragmentedEcho.class.getName() + ".mtu";
   private static final int MTU = Integer.getInteger(MTU_KEY, 1403); // [bytes]
 
@@ -77,6 +73,7 @@ public class SendFragmentedEcho {
 
     System.out.println(nif.getName() + "(" + nif.getDescription() + ")");
 
+    // 此处与上一个代码的套路一样, 以下代码为初始化及回调函数定义
     PcapHandle handle = nif.openLive(SNAPLEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
     PcapHandle sendHandle = nif.openLive(SNAPLEN, PromiscuousMode.PROMISCUOUS, READ_TIMEOUT);
     ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -91,23 +88,33 @@ public class SendFragmentedEcho {
       Task t = new Task(handle, listener);
       pool.execute(t);
 
+      // 构造发送的 IP 数据包主体, -28 是减去了 20B 的 IP 头和 8B 的 MAC 头
       byte[] echoData = new byte[TU - 28];
       for (int i = 0; i < echoData.length; i++) {
         echoData[i] = (byte) i;
       }
 
+      // 定义用于操作 ICMP 内层的 Builder, 包括标识符, 序号及选项
+      // Echo 是 ICMP 的类型, 类型序号为 8, 所以需要注意**大多数**不同类型的 ICMP 内层数据需要不同的内层 Builder
+      // 如 IcmpV4ParameterProblemPacket, IcmpV4TimestampPacket 等等, 一共 40 种
+      // 构造 ICMP 内层
       IcmpV4EchoPacket.Builder echoBuilder = new IcmpV4EchoPacket.Builder();
       echoBuilder
-          .identifier((short) 1)
+          .identifier((short) 1) // ICMP 标识符
+              // UnknownPacket 为未知的包对象, 适合用于 pcap4j 未定义的包协议, 但是这个不可以乱用, 在已知包协议的情况下最后不要用这个
+              // 特别注意 UnknownPacket.Builder() 是一个静态的方法, 只能通过公共方法向其传递原始数据包, 方法包括设置 rawData 及 payload
           .payloadBuilder(new UnknownPacket.Builder().rawData(echoData));
 
+      // 定义用于操作 ICMP 外层的 Builder, 包括类型, 代码, 校验和
+      // 构造 ICMP 外层
       IcmpV4CommonPacket.Builder icmpV4CommonBuilder = new IcmpV4CommonPacket.Builder();
       icmpV4CommonBuilder
-          .type(IcmpV4Type.ECHO)
-          .code(IcmpV4Code.NO_CODE)
+          .type(IcmpV4Type.ECHO) // ECHO 类型序号为 8,
+          .code(IcmpV4Code.NO_CODE) // NO_CODE 代码序号为 0, 类型 8 + 代码 0 = ping 请求
           .payloadBuilder(echoBuilder)
-          .correctChecksumAtBuild(true);
+          .correctChecksumAtBuild(true); // 校验和
 
+      // 构造 IPV4
       IpV4Packet.Builder ipV4Builder = new IpV4Packet.Builder();
       try {
         ipV4Builder
@@ -124,6 +131,7 @@ public class SendFragmentedEcho {
         throw new IllegalArgumentException(e1);
       }
 
+      // // 构造以太帧
       EthernetPacket.Builder etherBuilder = new EthernetPacket.Builder();
       etherBuilder
           .dstAddr(MacAddress.getByName(strDstMacAddress, ":"))
@@ -132,10 +140,18 @@ public class SendFragmentedEcho {
           .paddingAtBuild(true);
 
       for (int i = 0; i < COUNT; i++) {
+        // 为 ICMP 和 IPV4 分别添加序号和标识, 此时还未分片
         echoBuilder.sequenceNumber((short) i);
         ipV4Builder.identification((short) i);
 
+        // IpV4Helper.fragment 静态方法分片
         for (final Packet ipV4Packet : IpV4Helper.fragment(ipV4Builder.build(), MTU)) {
+          /*
+          这里介绍一下 AbstractBuilde, 顾名思义, 所有链路层以上特定协议的构造器都是继承自它
+          由于, 此代码构造了 ping 请求的"新型 IPV4 数据包", 故最好将其归类为新的 AbstractPacket
+          不过, 直接使用 IPV4 的构造器也是没问题的, 下面的代码也可以替换为它:
+          etherBuilder.payloadBuilder(ipV4Packet.getBuilder());
+           */
           etherBuilder.payloadBuilder(
               new AbstractBuilder() {
                 @Override
@@ -148,21 +164,21 @@ public class SendFragmentedEcho {
           sendHandle.sendPacket(p);
 
           try {
-            Thread.sleep(100);
+            Thread.sleep(100); // 发一个 IP 分片休息一下
           } catch (InterruptedException e) {
             break;
           }
         }
 
         try {
-          Thread.sleep(1000);
+          Thread.sleep(1000); // 发一个完整的 IP 包休息一下
         } catch (InterruptedException e) {
           break;
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
+    } finally { // 结束释放资源
       if (handle != null && handle.isOpen()) {
         try {
           handle.breakLoop();
