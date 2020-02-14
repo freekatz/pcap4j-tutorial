@@ -35,7 +35,7 @@ ICMP 详细原理见**维基百科**：
 
 #### 实现 #####
 
-```
+```java
 package org.pcap4j.sample;
 
 import java.io.IOException;

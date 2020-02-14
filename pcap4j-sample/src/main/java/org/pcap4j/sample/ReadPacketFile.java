@@ -23,6 +23,7 @@ public class ReadPacketFile {
   public static void main(String[] args) throws PcapNativeException, NotOpenException {
     PcapHandle handle;
     try {
+      // 时间戳精度为纳秒
       handle = Pcaps.openOffline(PCAP_FILE, TimestampPrecision.NANO);
     } catch (PcapNativeException e) {
       handle = Pcaps.openOffline(PCAP_FILE);

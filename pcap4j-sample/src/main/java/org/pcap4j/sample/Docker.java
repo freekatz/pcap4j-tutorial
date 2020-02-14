@@ -26,20 +26,25 @@ public class Docker {
   private static final String SNAPLEN_KEY = Docker.class.getName() + ".snaplen";
   private static final int SNAPLEN = Integer.getInteger(SNAPLEN_KEY, 65536); // [bytes]
 
+  // 设置 1MB 的缓存大小
   private static final String BUFFER_SIZE_KEY = Docker.class.getName() + ".bufferSize";
   private static final int BUFFER_SIZE =
       Integer.getInteger(BUFFER_SIZE_KEY, 1 * 1024 * 1024); // [bytes]
 
+  // 之前说过, 这里 NANO 必定为 false
   private static final String TIMESTAMP_PRECISION_NANO_KEY =
       Docker.class.getName() + ".timestampPrecision.nano";
   private static final boolean TIMESTAMP_PRECISION_NANO =
       Boolean.getBoolean(TIMESTAMP_PRECISION_NANO_KEY);
 
+  // 网卡 Name 即网卡的唯一标识码 uuid
   private static final String NIF_NAME_KEY = Docker.class.getName() + ".nifName";
   private static final String NIF_NAME = System.getProperty(NIF_NAME_KEY);
 
+  // 是否在捕获包之前, 调用 waitForPing 函数
   private static final String WAIT_KEY = Docker.class.getName() + ".wait";
-  private static final boolean WAIT = Boolean.getBoolean(WAIT_KEY);
+//  private static final boolean WAIT = Boolean.getBoolean(WAIT_KEY);
+  private static final boolean WAIT = true; // 自行改为 true
 
   private Docker() {}
 
@@ -54,7 +59,7 @@ public class Docker {
     System.out.println(NIF_NAME_KEY + ": " + NIF_NAME);
     System.out.println("\n");
 
-    if (WAIT) {
+    if (WAIT) { // WAIT 为 true 则调用此函数(会阻塞), 可以通过 ping 网关来结束此函数的阻塞
       waitForPing();
     }
 
@@ -62,17 +67,19 @@ public class Docker {
     if (NIF_NAME != null) {
       nif = Pcaps.getDevByName(NIF_NAME);
     } else {
-      nif = Pcaps.getDevByName("eth0");
+//      nif = Pcaps.getDevByName("eth0"); // 网卡名, eth0 适用于 Unix 系统, 在 Win 平台需要改正
+      nif = Pcaps.getDevByName("\\Device\\NPF_{C765F366-A156-43D7-AF26-B0824741C21E}");
     }
 
     System.out.println(nif.getName() + " (" + nif.getDescription() + ")");
-    for (PcapAddress addr : nif.getAddresses()) {
+    for (PcapAddress addr : nif.getAddresses()) { // 使用 for 循环适用于多 ip 的情况
       if (addr.getAddress() != null) {
         System.out.println("IP address: " + addr.getAddress());
       }
     }
     System.out.println("");
 
+    // 使用 Builder 定义 handle, 可传入更多参数
     PcapHandle.Builder phb =
         new PcapHandle.Builder(nif.getName())
             .snaplen(SNAPLEN)
@@ -111,8 +118,10 @@ public class Docker {
     handle.close();
   }
 
+  // 主要详细介绍一下这个函数
   private static void waitForPing() throws PcapNativeException, NotOpenException {
-    PcapNetworkInterface nif = Pcaps.getDevByName("eth0");
+//    PcapNetworkInterface nif = Pcaps.getDevByName("eth0");
+    PcapNetworkInterface nif = Pcaps.getDevByName("\\Device\\NPF_{C765F366-A156-43D7-AF26-B0824741C21E}");
     System.out.println(nif.getName() + " (" + nif.getDescription() + ")");
     for (PcapAddress addr : nif.getAddresses()) {
       if (addr.getAddress() != null) {
@@ -122,6 +131,7 @@ public class Docker {
     System.out.println("");
 
     PcapHandle handle = nif.openLive(65536, PromiscuousMode.NONPROMISCUOUS, 10);
+    // 专门捕获 icmp 数据包
     handle.setFilter("icmp", BpfCompileMode.OPTIMIZE);
 
     while (true) {
@@ -129,6 +139,7 @@ public class Docker {
       if (packet == null) {
         continue;
       }
+      // 如果捕获到的 icmp 数据包为回送请求或回送响应, 则停止捕获
       if (packet.contains(IcmpV4EchoPacket.class)) {
         break;
       }

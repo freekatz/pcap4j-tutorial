@@ -20,9 +20,11 @@ public class PcapFileMerger {
       PcapHandle handle = Pcaps.openOffline(pcapFile);
 
       if (dumper == null) {
+        // handle.dumpOpen 返回一个 dumper 对象
         dumper = handle.dumpOpen(PcapFileMerger.class.getSimpleName() + ".pcap");
       }
 
+      // dump packet, 注意, 这里使用的是 handle.getNextPacket() 还不是 Ex 版本
       PcapPacket packet;
       while ((packet = handle.getNextPacket()) != null) {
         dumper.dump(packet);
