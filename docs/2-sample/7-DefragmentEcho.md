@@ -114,8 +114,8 @@ public class DefragmentEcho {
       如 originalPackets.get(id).getBuilder() 就是从原始数据包映射中得到一个数据包, 并使用 .getBuilder() 方法得到此数据包的构建器
       2. builder 对象可使用各种方法操纵数据包, 如 Packet (链路层) 的 builder 可操纵整个 Packet 上层 (即链路层及链路层之上)的数据包, 而
       IpPacket (网络层) 的 builder 可操纵整个 IpPacket 上层 (即网络层及网络层之上)的数据包
-      3. .getLowerLayerOf 方法即得到下层的具体协议的构建器, 再使用 .payloadBuilder 方法将传入的 builder 上传或是设置到 builder 中
-      如果不设置则 builder 只会构建到网络层, 设置之后才可以构建到最上层 (此代码为 IcmpV4)
+      3. .getLowerLayerOf 方法即得到上层（注意，这里有一些歧义，我觉得改为 getUpperLayer 更好）的具体协议的构建器, 再使用 .payloadBuilder 方法将传入的 builder 上传或是设置到 builder 中
+      如果不设置则 builder 只会构建到网络层, 设置之后才可以构建到最上层
       4. .build 方法则是构建数据包, 返回 PcapPacket 对象
       5. 编写程序时一定要注意 payload 和 builder 类型的一致性, 试想一下, 给一个 IpV4 构建器 payload 一个 Icmp 的构建器肯定是不行的
        */
