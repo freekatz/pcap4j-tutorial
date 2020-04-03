@@ -7,8 +7,6 @@ pcap4j-tutorial
 
 结合日常使用为 Pcap4j 库提供的样例代码编写的说明文档及源码注释
 
-如果需要更好的阅读体验，请前往：[我的博客](http://zjh567.cn/category/tutorial/pcap4j/)
-
 Content
 ------
 
